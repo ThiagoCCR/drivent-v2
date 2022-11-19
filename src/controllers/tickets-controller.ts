@@ -38,28 +38,3 @@ export async function createTicket(req: AuthenticatedRequest, res: Response) {
   }
 }
 
-// export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, res: Response) {
-//   try {
-//     await enrollmentsService.createOrUpdateEnrollmentWithAddress({
-//       ...req.body,
-//       userId: req.userId,
-//     });
-
-//     return res.sendStatus(httpStatus.OK);
-//   } catch (error) {
-//     return res.sendStatus(httpStatus.BAD_REQUEST);
-//   }
-// }
-
-// export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response) {
-//   const { cep } = req.query as Record<string, string>;
-
-//   try {
-//     const address = await enrollmentsService.getAddressFromCEP(cep);
-//     return res.status(httpStatus.OK).send(address);
-//   } catch (error) {
-//     if (error.name === "NotFoundError") {
-//       return res.send(httpStatus.NO_CONTENT);
-//     }
-//   }
-// }

@@ -10,7 +10,4 @@ ticketsRouter
   .get("/", findTicket)
   .post("/", createTicket);
 
-//.get("/", getEnrollmentByUser)
-//.post("/", validateBody(createEnrollmentSchema), postCreateOrUpdateEnrollment);
-
 export { ticketsRouter };

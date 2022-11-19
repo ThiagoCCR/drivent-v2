@@ -5,6 +5,12 @@ async function findManyTicketType(): Promise<TicketType[]> {
   return await prisma.ticketType.findMany();
 }
 
+async function findTicketById(ticketId: number): Promise<Ticket> {
+  return await prisma.ticket.findFirst({
+    where: { id: ticketId }
+  });
+}
+
 async function findTicketByEnrollment(enrollmentId: number): Promise<Ticket> {
   return await prisma.ticket.findFirst({
     where: { enrollmentId },
@@ -30,7 +36,8 @@ async function createTicket(ticketTypeId: number, enrollmentId: number): Promise
 const ticketRepository = {
   findManyTicketType,
   findTicketByEnrollment,
-  createTicket
+  createTicket,
+  findTicketById
 };
 
 export default ticketRepository;
