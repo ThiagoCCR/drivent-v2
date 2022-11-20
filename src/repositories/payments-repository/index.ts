@@ -1,36 +1,27 @@
 import { prisma } from "@/config";
-import { TicketType, Ticket, Payment } from "@prisma/client";
+import { Payment } from "@prisma/client";
+import { processPaymentBody } from "@/protocols";
 
-async function findManyTicketType(ticketId: number): Promise<Payment> {
+async function findPaymentData(ticketId: number): Promise<Payment> {
   return await prisma.payment.findFirst({
     where: { ticketId }
   });
 }
 
-// async function findTicketByEnrollment(enrollmentId: number): Promise<Ticket> {
-//   return await prisma.ticket.findFirst({
-//     where: { enrollmentId },
-//     include: {
-//       TicketType: true,
-//     },
-//   });
-// }
-
-// async function createTicket(ticketTypeId: number, enrollmentId: number): Promise<Ticket> {
-//   return await prisma.ticket.create({
-//     data: {
-//       status: "RESERVED",
-//       ticketTypeId: ticketTypeId,
-//       enrollmentId: enrollmentId,
-//     },
-//     include: {
-//       TicketType: true,
-//     }
-//   });
-// }
+async function createPayment(ticketData: processPaymentBody): Promise<Payment> {
+  return await prisma.payment.create({
+    data: {
+      ticketId: ticketData.ticketId,
+      cardIssuer: ticketData.cardData.issuer,
+      value: ticketData.price,
+      cardLastDigits: ticketData.cardLastDigits
+    }
+  });
+}
 
 const paymentsRepository = {
-  findManyTicketType
+  findPaymentData,
+  createPayment
 };
 
 export default paymentsRepository;

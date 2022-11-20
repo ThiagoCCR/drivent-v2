@@ -2,7 +2,7 @@ import { AuthenticatedRequest } from "@/middlewares";
 import paymentsService from "@/services/payments-service";
 import { Response } from "express";
 import httpStatus from "http-status";
-import { number } from "joi";
+import { processPaymentBody } from "@/protocols";
 
 export async function findPaymentByTicketId(req: AuthenticatedRequest, res: Response) {
   const { ticketId } = req.query;
@@ -22,28 +22,20 @@ export async function findPaymentByTicketId(req: AuthenticatedRequest, res: Resp
   }
 }
 
-// export async function findTicket(req: AuthenticatedRequest, res: Response) {
-//   const { userId } = req;
-
-//   try {
-//     const ticket = await ticketsService.findTicketByUserId(userId);
+export async function processPayment(req: AuthenticatedRequest, res: Response) {
+  const ticketData = req.body as processPaymentBody;
+  const { userId } = req;
   
-//     return res.status(httpStatus.OK).send(ticket);
-//   } catch (error) {
-//     return res.sendStatus(httpStatus.NOT_FOUND);
-//   }
-// }
-
-// export async function createTicket(req: AuthenticatedRequest, res: Response) {
-//   const { userId } = req;
-//   const { ticketTypeId } = req.body;
-
-//   if (!ticketTypeId) return res.sendStatus(httpStatus.BAD_REQUEST);
-
-//   try {
-//     const newTicket = await ticketsService.createNewTicket(ticketTypeId, userId);
-//     return res.status(httpStatus.CREATED).send(newTicket);
-//   } catch (error) {
-//     return res.sendStatus(httpStatus.NOT_FOUND);
-//   }
-// }
+  try {
+    const paymentData = await paymentsService.processPayment(ticketData, userId);
+    return res.status(httpStatus.OK).send(paymentData);
+  } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.status(httpStatus.NOT_FOUND).send(error);
+    }
+    if (error.name === "UnauthorizedError") {
+      return res.status(httpStatus.UNAUTHORIZED).send(error);
+    }
+    return res.status(httpStatus.BAD_REQUEST).send(error);
+  }
+}

@@ -2,6 +2,7 @@ import { AuthenticatedRequest } from "@/middlewares";
 import ticketsService from "@/services/tickets-service";
 import { Response } from "express";
 import httpStatus from "http-status";
+import { number } from "joi";
 
 export async function findTicketTypes(req: AuthenticatedRequest, res: Response) {
   try {
@@ -26,15 +27,16 @@ export async function findTicket(req: AuthenticatedRequest, res: Response) {
 
 export async function createTicket(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
-  const { ticketTypeId } = req.body;
-
-  if (!ticketTypeId) return res.sendStatus(httpStatus.BAD_REQUEST);
+  const ticketTypeId = req.body.ticketTypeId as number;
 
   try {
     const newTicket = await ticketsService.createNewTicket(ticketTypeId, userId);
     return res.status(httpStatus.CREATED).send(newTicket);
   } catch (error) {
-    return res.sendStatus(httpStatus.NOT_FOUND);
+    if (error.name === "RequestError") {
+      return res.status(httpStatus.BAD_REQUEST).send(error);
+    }
+    return res.sendStatus(httpStatus.NOT_FOUND).send(error);
   }
 }
 
